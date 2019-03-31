@@ -28,6 +28,48 @@ Vue.component('app-footer', {
     `
 });
 
+const uploadForm = Vue.component('upload-form',{
+  template:`
+    <form @submit.prevent="uploadPhoto" id="uploadForm" method = "post" enctype="multipart/form-data">
+      <div>
+        <label for="description">Description</label>
+        <textarea name="description" rows="4" cols="50"></textarea>
+      </div
+      <div>
+        <label for="Photo">Photo</label>
+        <input type="file" name="photo">
+      </div>
+      <div>
+        <button type="submit" name="submit" class="btn btn-primary">Upload file</button>
+      </div>
+    </form>
+  `,
+    methods:{
+      uploadPhoto: function(){
+        let uploadFormData=document.getElementById('uploadForm');
+        let formData = new FormData(uploadFormData);
+        fetch("/api/upload",{
+          method:'POST',
+          body: formData,
+          headers:{
+            'X-CSRFToken':token 
+          },
+          credentials:'same-origin'
+        })
+        .then(function(response){
+          return response.json(); 
+        })
+        .then(function(jsonResponse){
+          //display a success message 
+          console.log(jsonResponse);
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+      } 
+    }
+});
+
 const Home = Vue.component('home', {
    template: `
     <div class="jumbotron">
@@ -57,7 +99,7 @@ const router = new VueRouter({
     routes: [
         {path: "/", component: Home},
         // Put other routes here
-
+        {path: "/api/upload", component: uploadForm},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
